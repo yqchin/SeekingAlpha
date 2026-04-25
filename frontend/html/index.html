@@ -58,14 +58,6 @@
                     <p class="limit-sub">Total Limit 2,400.00 <i class="fa-solid fa-angle-right"></i></p>
                 </div>
 
-                <button class="boost-card" id="boost-btn" type="button">
-                    <div class="boost-left">
-                        <p class="boost-title">SA Limit Boost</p>
-                        <p class="boost-text">For selected merchants. Valid until 30 Apr 2026</p>
-                    </div>
-                    <strong class="boost-amount">+ RM 4,630.00</strong>
-                </button>
-
                 <div class="bill-card">
                     <div>
                         <p class="bill-amount" id="due-amount">RM 0.00</p>
@@ -258,19 +250,54 @@
             </section>
 
             <section class="login-view show" id="login-view" aria-hidden="false">
-                <div class="login-card">
-                    <span class="login-brand" aria-hidden="true">
+                <div class="login-top">
+                    <div class="login-brand-wrap" aria-hidden="true">
                         <img src="../assets/seeking-alpha-logo.svg" alt="">
-                    </span>
-                    <p class="login-kicker">Welcome to SALaterPay</p>
-                    <h2>Sign in to continue</h2>
+                    </div>
+                    <p class="login-app-name">SALaterPay</p>
+                    <p class="login-tagline">Your smart credit companion</p>
+                </div>
+
+                <div class="login-card">
+                    <div class="login-card-drag" aria-hidden="true"></div>
+                    <h2 class="login-card-title">Sign in</h2>
+                    <p class="login-card-sub">Enter your email to view your limit &amp; risk score</p>
 
                     <form class="login-form" id="login-form">
-                        <label for="login-username">Username</label>
-                        <input id="login-username" type="text" placeholder="Enter username" autocomplete="username">
+                        <div class="login-field">
+                            <label for="login-username">Email address</label>
+                            <div class="login-input-wrap">
+                                <i class="fa-regular fa-envelope login-input-icon"></i>
+                                <input id="login-username" type="email" placeholder="you@example.com" autocomplete="email">
+                            </div>
+                        </div>
 
-                        <button class="login-submit-btn" id="login-submit-btn" type="submit">Sign In</button>
+                        <div class="login-field">
+                            <div class="login-label-row">
+                                <label for="login-password">Password</label>
+                                <button class="login-forgot-btn" type="button" tabindex="-1">Forgot?</button>
+                            </div>
+                            <div class="login-input-wrap">
+                                <i class="fa-solid fa-lock login-input-icon"></i>
+                                <input id="login-password" type="password" placeholder="••••••••" autocomplete="current-password">
+                                <button class="login-eye-btn" id="login-eye-btn" type="button" aria-label="Toggle password visibility" tabindex="-1">
+                                    <i class="fa-regular fa-eye" id="login-eye-icon"></i>
+                                </button>
+                            </div>
+                            <p class="login-optional-hint">Password is optional for this demo</p>
+                        </div>
+
+                        <p class="login-error" id="login-error" aria-live="polite"></p>
+
+                        <button class="login-submit-btn" id="login-submit-btn" type="submit">
+                            <span id="login-btn-text">Sign In</span>
+                            <i class="fa-solid fa-arrow-right" id="login-btn-icon"></i>
+                        </button>
                     </form>
+
+                    <p class="login-footer-note">
+                        <i class="fa-solid fa-shield-halved"></i> Your data is encrypted and secure
+                    </p>
                 </div>
             </section>
 

@@ -133,24 +133,108 @@
         closeLogoutView();
     }
 
+    /* ── Credit API ───────────────────────────────────────────────────── */
+
+    var API_URL = '/api/predict-credit/';
+
+    function formatRM(amount) {
+        return 'RM ' + Number(amount).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function bandToInterestRate(band) {
+        var map = { 'Healthy': '1.8% / year', 'Moderate': '3.5% / year', 'Poor': '6.0% / year' };
+        return map[band] || '6.0% / year';
+    }
+
+    function scoreToOrbClass(score) {
+        if (score >= 70) return 'risk-high';
+        if (score >= 50) return 'risk-medium';
+        return 'risk-low';
+    }
+
+    function bandToLabel(band, decision) {
+        if (decision === 'REJECT') return 'High Risk';
+        var map = { 'Healthy': 'Low Risk', 'Moderate': 'Medium Risk', 'Poor': 'High Risk' };
+        return map[band] || band;
+    }
+
+    function populateDashboard(data) {
+        var limitEl        = $('available-limit');
+        var limitSubEl     = document.querySelector('.limit-sub');
+        var riskNumEl      = $('risk-score-number');
+        var riskBandEl     = $('risk-band');
+        var interestEl     = $('interest-rate');
+        var riskOrbEl      = $('risk-orb');
+        var riskCardEl     = $('risk-card');
+
+        var limit = data.decision === 'REJECT' ? 0 : data.loan_limit;
+
+        if (limitEl)    limitEl.textContent = formatRM(limit);
+        if (limitSubEl) limitSubEl.innerHTML = 'Total Limit ' +
+            Number(limit).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
+            ' <i class="fa-solid fa-angle-right"></i>';
+        if (riskNumEl)  riskNumEl.textContent = data.credit_score;
+        if (riskBandEl) riskBandEl.textContent = bandToLabel(data.band, data.decision);
+        if (interestEl) interestEl.textContent = bandToInterestRate(data.band);
+        if (riskOrbEl) {
+            riskOrbEl.className = 'risk-orb ' + scoreToOrbClass(data.credit_score);
+        }
+        if (riskCardEl) riskCardEl.dataset.riskScore = data.credit_score;
+    }
+
     /* Login interactions */
-    var loginForm = $('login-form');
+    var loginForm     = $('login-form');
     var loginUsername = $('login-username');
     var logoutUsername = $('logout-username');
 
     if (loginForm) {
         loginForm.addEventListener('submit', function (event) {
             event.preventDefault();
-            var user = loginUsername ? loginUsername.value.trim() : '';
+            var email     = loginUsername ? loginUsername.value.trim() : '';
+            var errorEl   = $('login-error');
+            var submitBtn = $('login-submit-btn');
 
-            if (!user) {
-                showToast('Please enter your username.');
+            if (errorEl) errorEl.textContent = '';
+
+            if (!email) {
+                if (errorEl) errorEl.textContent = 'Please enter your email address.';
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                if (errorEl) errorEl.textContent = 'Please enter a valid email address.';
                 return;
             }
 
-            if (logoutUsername) logoutUsername.textContent = 'Username: ' + user;
-            closeLoginView();
-            showToast('Welcome back to SALaterPay.');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = 'Signing in…'; }
+
+            fetch(API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ customer_email: email })
+            })
+            .then(function (res) {
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                return res.json();
+            })
+            .then(function (data) {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Sign In'; }
+
+                var displayName = data.customer_name || email;
+                if (logoutUsername) logoutUsername.textContent = 'Signed in as: ' + displayName;
+
+                populateDashboard(data);
+                closeLoginView();
+
+                if (data.decision === 'APPROVE') {
+                    showToast('Welcome back, ' + displayName + '!');
+                } else {
+                    showToast('Signed in. Credit application not approved.');
+                }
+            })
+            .catch(function () {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = 'Sign In'; }
+                if (errorEl) errorEl.textContent = 'Could not retrieve your data. Please try again.';
+            });
         });
     }
 
@@ -370,6 +454,28 @@
     if (backBtn) {
         backBtn.addEventListener('click', function () {
             showToast('Navigate back.');
+        });
+    }
+
+    /* Password show/hide toggle */
+    var eyeBtn  = $('login-eye-btn');
+    var eyeIcon = $('login-eye-icon');
+    var pwdInput = $('login-password');
+    if (eyeBtn && pwdInput) {
+        eyeBtn.addEventListener('click', function () {
+            var isHidden = pwdInput.type === 'password';
+            pwdInput.type = isHidden ? 'text' : 'password';
+            if (eyeIcon) {
+                eyeIcon.className = isHidden ? 'fa-regular fa-eye-slash' : 'fa-regular fa-eye';
+            }
+        });
+    }
+
+    /* Forgot password toast */
+    var forgotBtn = document.querySelector('.login-forgot-btn');
+    if (forgotBtn) {
+        forgotBtn.addEventListener('click', function () {
+            showToast('Password reset coming soon.');
         });
     }
 
