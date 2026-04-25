@@ -19,22 +19,7 @@
                     <span><i class="fa-solid fa-signal"></i> 4G <i class="fa-solid fa-battery-three-quarters"></i> 63%</span>
                 </div>
 
-                <div class="search-strip">
-                    <button class="country-pill" id="country-btn" type="button">
-                        <i class="fa-solid fa-flag"></i> MY
-                    </button>
-                    <button class="search-pill" id="search-btn" type="button">
-                        <i class="fa-solid fa-magnifying-glass"></i> Search
-                    </button>
-                    <button class="icon-btn clear small" id="profile-btn" type="button" aria-label="Profile">
-                        <i class="fa-solid fa-user"></i>
-                    </button>
-                </div>
-
                 <div class="top-bar">
-                    <button class="icon-btn clear" id="back-btn" type="button" aria-label="Go back">
-                        <i class="fa-solid fa-arrow-left"></i>
-                    </button>
                     <span class="brand-logo" aria-hidden="true">
                         <img src="../assets/seeking-alpha-logo.svg" alt="Seeking Alpha logo">
                     </span>
@@ -43,11 +28,8 @@
                         <p class="subtitle">Seeking Alpha Wallet</p>
                     </div>
                     <div class="right-actions">
-                        <button class="icon-btn clear" id="notify-btn" type="button" aria-label="Notifications">
-                            <i class="fa-regular fa-bell"></i>
-                        </button>
-                        <button class="icon-btn clear" id="settings-btn" type="button" aria-label="Settings">
-                            <i class="fa-solid fa-gear"></i>
+                        <button class="icon-btn clear" id="profile-btn" type="button" aria-label="Profile">
+                            <i class="fa-solid fa-user"></i>
                         </button>
                     </div>
                 </div>
@@ -58,7 +40,7 @@
                     <p class="limit-sub">Total Limit 2,400.00 <i class="fa-solid fa-angle-right"></i></p>
                 </div>
 
-                <div class="bill-card">
+                <div class="bill-card" id="bill-card" role="button" tabindex="0" aria-label="Open my bills">
                     <div>
                         <p class="bill-amount" id="due-amount">RM 0.00</p>
                         <p class="bill-note">Due date falls on 20th of each month</p>
@@ -68,73 +50,95 @@
             </header>
 
             <section class="surface">
-                <div class="tab-row">
-                    <button class="tab-btn active" type="button" id="my-bill-btn">
-                        <i class="fa-regular fa-file-lines"></i> My Bill
-                    </button>
-                    <button class="tab-btn" type="button" id="transaction-btn">
-                        <i class="fa-solid fa-clock-rotate-left"></i> History
-                    </button>
-                </div>
-
                 <section class="risk-rate-card" id="risk-card" data-risk-score="82">
-                    <div class="risk-orb" id="risk-orb" aria-label="Risk score">
-                        <span id="risk-score-number">82</span>
+                    <div class="risk-meter-head">
+                        <div>
+                            <p class="risk-title">Risk Score</p>
+                            <p class="risk-band" id="risk-band">Healthy</p>
+                        </div>
+                        <div class="risk-score-pill">
+                            <span id="risk-score-number">82</span><small>/100</small>
+                        </div>
                     </div>
-                    <div class="risk-copy">
-                        <p class="risk-title">Risk Score</p>
-                        <p class="risk-band" id="risk-band">Low Risk</p>
-                        <p class="interest-line">Interest rate: <strong id="interest-rate">1.8% / year</strong></p>
+                    <div class="risk-meter-track" aria-label="Risk score from 0 to 100">
+                        <span class="risk-band-fill risky"></span>
+                        <span class="risk-band-fill cautious"></span>
+                        <span class="risk-band-fill healthy"></span>
+                        <span class="risk-pointer" id="risk-pointer"></span>
+                    </div>
+                    <div class="risk-scale">
+                        <span>Risky</span>
+                        <span>Cautious</span>
+                        <span>Healthy</span>
+                    </div>
+                    <div class="risk-meta">
+                        <p>Default: <strong id="bad-proba">--</strong></p>
+                        <p>Repay: <strong id="good-proba">--</strong></p>
                     </div>
                 </section>
 
-                <div class="quick-grid">
-                    <button class="quick-item" type="button" id="offers-btn">
-                        <span class="quick-icon"><i class="fa-solid fa-crown"></i></span>
-                        <span>Best Offers</span>
-                    </button>
-                    <button class="quick-item" type="button" id="vouchers-btn">
-                        <span class="quick-icon"><i class="fa-solid fa-ticket"></i></span>
-                        <span>Vouchers</span>
-                    </button>
-                    <button class="quick-item" type="button" id="coins-btn">
-                        <span class="quick-icon"><i class="fa-solid fa-coins"></i></span>
-                        <span>SA Coins</span>
-                    </button>
-                    <button class="quick-item" type="button" id="finance-btn">
-                        <span class="quick-icon"><i class="fa-solid fa-chart-line"></i></span>
-                        <span>Financial Tips</span>
-                    </button>
-                </div>
+                <section class="credit-improve-card" id="credit-improve-card">
+                    <div class="credit-improve-head">
+                        <div>
+                            <p class="card-kicker">Credit Improvement</p>
+                            <h2>Improve Your Credit Score</h2>
+                        </div>
+                        <span class="estimate-chip">Estimate</span>
+                    </div>
 
-                <article class="feature-card">
-                    <div class="feature-icon orange">
-                        <i class="fa-solid fa-sack-dollar"></i>
-                    </div>
-                    <div class="feature-copy">
-                        <h3>SA Loans</h3>
-                        <p>Instant cash out. Flexible usage with SA merchants.</p>
-                    </div>
-                    <button class="ghost-btn" id="activate-btn" type="button">Activate For Free</button>
-                </article>
+                    <p class="credit-improve-copy" id="credit-improve-copy">
+                        Small changes can move your score over time. This is an educational estimate, not a guaranteed approval.
+                    </p>
 
-                <article class="feature-card split">
-                    <div class="feature-icon pie">
-                        <i class="fa-solid fa-chart-pie"></i>
-                    </div>
-                    <div class="feature-copy">
-                        <h3>SA Installments</h3>
-                        <p>Need more time to pay your upcoming bill? Try installment today.</p>
-                    </div>
-                    <button class="primary-btn" id="split-btn" type="button">Check Now</button>
-                </article>
+                    <div class="driver-list" id="driver-list"></div>
 
-                <div class="banner">
-                    <div class="banner-copy">
-                        <p class="banner-kicker">SEEKING ALPHA DEALS</p>
-                        <h3>10% OFF + Extra RM20 OFF</h3>
+                    <div class="simulator-panel">
+                        <div class="simulator-scores">
+                            <div class="score-box">
+                                <span>Current score</span>
+                                <strong id="sim-current-score">82</strong>
+                            </div>
+                            <div class="score-box projected">
+                                <span>Projected score</span>
+                                <strong id="sim-projected-score">82</strong>
+                            </div>
+                            <div class="score-box">
+                                <span>Estimated delta</span>
+                                <strong id="sim-score-delta">+0</strong>
+                            </div>
+                        </div>
+
+                        <div class="mini-meter">
+                            <span class="mini-meter-fill" id="sim-meter-fill"></span>
+                        </div>
+                        <p class="projected-band" id="sim-projected-band">Projected band: Healthy</p>
+
+                        <div class="sim-controls">
+                            <label class="sim-control" for="sim-debt">
+                                <span>Settle debt</span>
+                                <input id="sim-debt" type="range" min="0" max="100" value="0">
+                            </label>
+                            <label class="sim-control" for="sim-ccris">
+                                <span>Improve CCRIS</span>
+                                <input id="sim-ccris" type="range" min="0" max="100" value="0">
+                            </label>
+                            <label class="sim-control" for="sim-loan">
+                                <span>Reduce loan amount</span>
+                                <input id="sim-loan" type="range" min="0" max="100" value="0">
+                            </label>
+                            <label class="sim-control" for="sim-frequency">
+                                <span>Repayment frequency</span>
+                                <select id="sim-frequency">
+                                    <option value="0">No change</option>
+                                    <option value="0.35">Monthly</option>
+                                    <option value="0.7">Fortnightly</option>
+                                    <option value="1">Weekly</option>
+                                </select>
+                            </label>
+                        </div>
                     </div>
-                </div>
+                </section>
+
             </section>
 
             <footer class="action-bar">
@@ -162,13 +166,9 @@
                 </header>
 
                 <div class="bills-tabs">
-                    <button class="bills-tab active" id="bills-upcoming-btn" type="button">Upcoming Bill</button>
                     <button class="bills-tab" id="bills-billed-btn" type="button">Billed</button>
                 </div>
 
-                <div class="bills-scroll">
-                    <div class="bills-content" id="bills-upcoming-list">
-                        <p class="bills-year">Upcoming Bill</p>
                         <button class="bill-item" type="button" id="upcoming-apr-btn">
                             <div>
                                 <p class="bill-month">Apr</p>

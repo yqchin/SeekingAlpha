@@ -118,15 +118,6 @@
         }
     }
 
-    /* ── Tab row (My Bill / History) ──────────────────────────────────── */
-
-    function setTabActive(activeId, inactiveId) {
-        var a = $(activeId);
-        var b = $(inactiveId);
-        if (a) a.classList.add('active');
-        if (b) b.classList.remove('active');
-    }
-
     function closeAllOverlayViews() {
         closeBills();
         closePaymentConfirmation();
@@ -141,21 +132,200 @@
         return 'RM ' + Number(amount).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
-    function bandToInterestRate(band) {
-        var map = { 'Healthy': '1.8% / year', 'Moderate': '3.5% / year', 'Poor': '6.0% / year' };
-        return map[band] || '6.0% / year';
-    }
-
-    function scoreToOrbClass(score) {
-        if (score >= 70) return 'risk-high';
-        if (score >= 50) return 'risk-medium';
-        return 'risk-low';
-    }
-
     function bandToLabel(band, decision) {
-        if (decision === 'REJECT') return 'High Risk';
-        var map = { 'Healthy': 'Low Risk', 'Moderate': 'Medium Risk', 'Poor': 'High Risk' };
-        return map[band] || band;
+        if (decision === 'REJECT') return 'Risky';
+        var map = { 'Healthy': 'Healthy', 'Moderate': 'Cautious', 'Poor': 'Risky' };
+        return map[band] || scoreToBandLabel(null, band);
+    }
+
+    function clamp(value, min, max) {
+        value = Number(value);
+        if (!isFinite(value)) return min;
+        return Math.max(min, Math.min(max, value));
+    }
+
+    function scoreToBandLabel(score, fallback) {
+        if (score === null || score === undefined || score === '') return fallback || 'Cautious';
+        score = clamp(score, 0, 100);
+        if (score >= 70) return 'Healthy';
+        if (score >= 50) return 'Cautious';
+        return 'Risky';
+    }
+
+    function formatPercent(value) {
+        if (value === null || value === undefined || value === '') return '--';
+        value = Number(value);
+        if (!isFinite(value)) return '--';
+        if (value <= 1) value = value * 100;
+        return value.toFixed(1) + '%';
+    }
+
+    function formatDriverValue(value) {
+        if (value === null || value === undefined || value === '') return 'Not available';
+        if (typeof value === 'number') return Number(value.toFixed(2)).toLocaleString('en-MY');
+        return String(value);
+    }
+
+    function escapeHtml(value) {
+        return String(value).replace(/[&<>"']/g, function (char) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#39;'
+            }[char];
+        });
+    }
+
+    var DRIVER_GUIDANCE = {
+        clearfraudscore: {
+            issue: 'Thin or weaker credit history',
+            action: 'Build a cleaner CCRIS record with consistent repayments.',
+            direction: 'Increase'
+        },
+        repayment_ratio: {
+            issue: 'Existing debt is taking up too much repayment capacity',
+            action: 'Settle outstanding debt before applying again.',
+            direction: 'Decrease'
+        },
+        loanAmount: {
+            issue: 'Requested amount is high for the current profile',
+            action: 'Try a smaller loan amount first.',
+            direction: 'Decrease'
+        },
+        payFrequency: {
+            issue: 'Repayment schedule could be stronger',
+            action: 'Choose a more frequent repayment plan when possible.',
+            direction: 'Increase'
+        },
+        nPaidOff: {
+            issue: 'Limited completed repayment history',
+            action: 'Complete more repayments on time.',
+            direction: 'Increase'
+        },
+        apr: {
+            issue: 'High-cost borrowing exposure',
+            action: 'Reduce expensive borrowing where possible.',
+            direction: 'Decrease'
+        },
+        leadType_risk: {
+            issue: 'Application channel carries extra risk',
+            action: 'Use safer or verified application channels.',
+            direction: 'Decrease'
+        },
+        ind_totalnumberoffraudindicators: {
+            issue: 'Suspicious transaction indicators were detected',
+            action: 'Reduce unusual or suspicious transaction behavior.',
+            direction: 'Decrease'
+        }
+    };
+
+    var dashboardData = {
+        credit_score: 82,
+        band: 'Healthy',
+        decision: 'APPROVE',
+        reject_drivers: []
+    };
+
+    function normalizeDriver(raw) {
+        var feature = raw.feature || raw.name || raw.driver || raw.column || '';
+        var contribution = Number(raw.contribution || raw.impact || raw.weight || 0);
+        return {
+            feature: feature,
+            contribution: isFinite(contribution) ? Math.abs(contribution) : 0,
+            value: raw.value !== undefined ? raw.value : raw.current_value
+        };
+    }
+
+    function sortedDrivers(data) {
+        return (data.reject_drivers || [])
+            .map(normalizeDriver)
+            .filter(function (driver) { return driver.feature; })
+            .sort(function (a, b) { return b.contribution - a.contribution; });
+    }
+
+    function renderDrivers(data) {
+        var list = $('driver-list');
+        var copy = $('credit-improve-copy');
+        if (!list) return;
+
+        var drivers = sortedDrivers(data);
+        list.innerHTML = '';
+
+        if (copy) {
+            copy.textContent = data.decision === 'REJECT'
+                ? 'These factors had the largest effect on the rejected application. The simulator below is only an educational estimate.'
+                : 'Your account is in good standing. Use these habits to protect or improve your score over time.';
+        }
+
+        if (!drivers.length) {
+            list.innerHTML =
+                '<div class="driver-empty">' +
+                    '<strong>Keep building positive history</strong>' +
+                    '<span>Pay on time, keep balances manageable, and avoid unusual transaction activity.</span>' +
+                '</div>';
+            return;
+        }
+
+        drivers.forEach(function (driver) {
+            var guide = DRIVER_GUIDANCE[driver.feature] || {
+                issue: driver.feature.replace(/_/g, ' '),
+                action: 'Improve this factor where possible before applying again.',
+                direction: 'Improve'
+            };
+            var level = driver.contribution >= 0.25 ? 'High' : driver.contribution >= 0.1 ? 'Medium' : 'Low';
+            var card = document.createElement('article');
+            card.className = 'driver-card impact-' + level.toLowerCase();
+            card.innerHTML =
+                '<div class="driver-card-head">' +
+                    '<strong>' + escapeHtml(guide.issue) + '</strong>' +
+                    '<span>' + level + ' impact</span>' +
+                '</div>' +
+                '<p>' + escapeHtml(guide.action) + '</p>' +
+                '<div class="driver-meta">' +
+                    '<span>Current: <b>' + escapeHtml(formatDriverValue(driver.value)) + '</b></span>' +
+                    '<span>Direction: <b>' + escapeHtml(guide.direction) + '</b></span>' +
+                '</div>';
+            list.appendChild(card);
+        });
+    }
+
+    function driverWeight(feature) {
+        var match = sortedDrivers(dashboardData).filter(function (driver) {
+            return driver.feature === feature;
+        })[0];
+        return match ? clamp(match.contribution, 0.04, 0.45) : 0.08;
+    }
+
+    function simulatorValue(id) {
+        var el = $(id);
+        if (!el) return 0;
+        return clamp(el.value, 0, 100) / 100;
+    }
+
+    function updateSimulator() {
+        var score = clamp(dashboardData.credit_score || 0, 0, 100);
+        var uplift =
+            simulatorValue('sim-debt') * 22 * driverWeight('repayment_ratio') +
+            simulatorValue('sim-ccris') * 24 * driverWeight('clearfraudscore') +
+            simulatorValue('sim-loan') * 18 * driverWeight('loanAmount') +
+            Number(($('sim-frequency') || {}).value || 0) * 14 * driverWeight('payFrequency');
+        uplift = clamp(uplift, 0, 100 - score);
+
+        var projected = Math.round(score + uplift);
+        var delta = projected - Math.round(score);
+        var currentEl = $('sim-current-score');
+        var projectedEl = $('sim-projected-score');
+        var deltaEl = $('sim-score-delta');
+        var bandEl = $('sim-projected-band');
+        var fillEl = $('sim-meter-fill');
+
+        if (currentEl) currentEl.textContent = Math.round(score);
+        if (projectedEl) projectedEl.textContent = projected;
+        if (deltaEl) deltaEl.textContent = '+' + delta;
+        if (bandEl) bandEl.textContent = 'Projected band: ' + scoreToBandLabel(projected);
+        if (fillEl) fillEl.style.width = projected + '%';
     }
 
     function populateDashboard(data) {
@@ -163,23 +333,28 @@
         var limitSubEl     = document.querySelector('.limit-sub');
         var riskNumEl      = $('risk-score-number');
         var riskBandEl     = $('risk-band');
-        var interestEl     = $('interest-rate');
-        var riskOrbEl      = $('risk-orb');
         var riskCardEl     = $('risk-card');
+        var riskPointerEl  = $('risk-pointer');
+        var badProbaEl     = $('bad-proba');
+        var goodProbaEl    = $('good-proba');
+
+        dashboardData = data || dashboardData;
 
         var limit = data.decision === 'REJECT' ? 0 : data.loan_limit;
+        var score = clamp(data.credit_score, 0, 100);
 
         if (limitEl)    limitEl.textContent = formatRM(limit);
         if (limitSubEl) limitSubEl.innerHTML = 'Total Limit ' +
             Number(limit).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) +
             ' <i class="fa-solid fa-angle-right"></i>';
-        if (riskNumEl)  riskNumEl.textContent = data.credit_score;
+        if (riskNumEl)  riskNumEl.textContent = Math.round(score);
         if (riskBandEl) riskBandEl.textContent = bandToLabel(data.band, data.decision);
-        if (interestEl) interestEl.textContent = bandToInterestRate(data.band);
-        if (riskOrbEl) {
-            riskOrbEl.className = 'risk-orb ' + scoreToOrbClass(data.credit_score);
-        }
-        if (riskCardEl) riskCardEl.dataset.riskScore = data.credit_score;
+        if (riskPointerEl) riskPointerEl.style.left = score + '%';
+        if (badProbaEl) badProbaEl.textContent = formatPercent(data.bad_proba);
+        if (goodProbaEl) goodProbaEl.textContent = formatPercent(data.good_proba);
+        if (riskCardEl) riskCardEl.dataset.riskScore = score;
+        renderDrivers(data);
+        updateSimulator();
     }
 
     /* Login interactions */
@@ -258,21 +433,15 @@
 
     /* ── Wire up all buttons ──────────────────────────────────────────── */
 
-    /* My Bill tab → open bills slide-over */
-    var myBillBtn = $('my-bill-btn');
-    if (myBillBtn) {
-        myBillBtn.addEventListener('click', function () {
-            setTabActive('my-bill-btn', 'transaction-btn');
-            openBills();
-        });
-    }
-
-    /* History tab → toast (placeholder) */
-    var txBtn = $('transaction-btn');
-    if (txBtn) {
-        txBtn.addEventListener('click', function () {
-            setTabActive('transaction-btn', 'my-bill-btn');
-            showToast('Transaction history coming soon.');
+    /* Bill card → open bills slide-over */
+    var billCard = $('bill-card');
+    if (billCard) {
+        billCard.addEventListener('click', openBills);
+        billCard.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                openBills();
+            }
         });
     }
 
@@ -350,94 +519,8 @@
     if (paymentViewBillsBtn) {
         paymentViewBillsBtn.addEventListener('click', function () {
             closePaymentConfirmation();
-            setTabActive('my-bill-btn', 'transaction-btn');
             switchBillsTab('bills-upcoming-list', 'bills-billed-list', 'bills-upcoming-btn', 'bills-billed-btn');
             openBills();
-        });
-    }
-
-    /* Quick grid buttons → individual toasts */
-    var offersBtn = $('offers-btn');
-    if (offersBtn) {
-        offersBtn.addEventListener('click', function () {
-            showToast('Best Offers — exclusive deals for you!');
-        });
-    }
-
-    var vouchersBtn = $('vouchers-btn');
-    if (vouchersBtn) {
-        vouchersBtn.addEventListener('click', function () {
-            showToast('Vouchers — your free vouchers are ready.');
-        });
-    }
-
-    var coinsBtn = $('coins-btn');
-    if (coinsBtn) {
-        coinsBtn.addEventListener('click', function () {
-            showToast('SA Coins — earn coins on every purchase.');
-        });
-    }
-
-    var financeBtn = $('finance-btn');
-    if (financeBtn) {
-        financeBtn.addEventListener('click', function () {
-            showToast('Financial Tips — smart tips to save more.');
-        });
-    }
-
-    /* SA Loans activate button */
-    var activateBtn = $('activate-btn');
-    if (activateBtn) {
-        activateBtn.addEventListener('click', function () {
-            showToast('SA Loans activated successfully.');
-        });
-    }
-
-    /* SA Installments check now button */
-    var splitBtn = $('split-btn');
-    if (splitBtn) {
-        splitBtn.addEventListener('click', function () {
-            showToast('SA Installments — choose a plan that suits you.');
-        });
-    }
-
-    /* SA Limit Boost button */
-    var boostBtn = $('boost-btn');
-    if (boostBtn) {
-        boostBtn.addEventListener('click', function () {
-            showToast('SA Limit Boost applied for selected merchants.');
-        });
-    }
-
-    /* Notifications button */
-    var notifyBtn = $('notify-btn');
-    if (notifyBtn) {
-        notifyBtn.addEventListener('click', function () {
-            showToast('No new notifications.');
-        });
-    }
-
-    /* Settings button */
-    var settingsBtn = $('settings-btn');
-    if (settingsBtn) {
-        settingsBtn.addEventListener('click', function () {
-            showToast('Settings coming soon.');
-        });
-    }
-
-    /* Search button */
-    var searchBtn = $('search-btn');
-    if (searchBtn) {
-        searchBtn.addEventListener('click', function () {
-            showToast('Search merchants coming soon.');
-        });
-    }
-
-    /* Country pill */
-    var countryBtn = $('country-btn');
-    if (countryBtn) {
-        countryBtn.addEventListener('click', function () {
-            showToast('Country: Malaysia (MY)');
         });
     }
 
@@ -449,13 +532,15 @@
         });
     }
 
-    /* Back button (main header) */
-    var backBtn = $('back-btn');
-    if (backBtn) {
-        backBtn.addEventListener('click', function () {
-            showToast('Navigate back.');
-        });
-    }
+    ['sim-debt', 'sim-ccris', 'sim-loan', 'sim-frequency'].forEach(function (id) {
+        var el = $(id);
+        if (!el) return;
+        el.addEventListener('input', updateSimulator);
+        el.addEventListener('change', updateSimulator);
+    });
+
+    renderDrivers(dashboardData);
+    updateSimulator();
 
     /* Password show/hide toggle */
     var eyeBtn  = $('login-eye-btn');
