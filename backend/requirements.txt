@@ -6,6 +6,6 @@ gunicorn
 whitenoise
 mysql-connector-python
 boto3
-scikit-learn
+scikit-learn==1.7.2
 joblib
 pandas
