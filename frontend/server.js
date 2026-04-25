@@ -20,59 +20,37 @@ const MIME = {
     '.woff2':'font/woff2',
 };
 
-const BACKENDS = [
-    { hostname: 'seekingalpha-alb-822910622.ap-southeast-1.elb.amazonaws.com', port: 80 },
-    { hostname: '47.250.212.10', port: 80 },
-];
-
-function tryProxy(req, res, body, index) {
-    if (index >= BACKENDS.length) {
-        res.writeHead(502, { 'Content-Type': 'text/plain' });
-        res.end('502 — All backends unreachable');
-        return;
-    }
-
-    const backend = BACKENDS[index];
-    const options = {
-        hostname: backend.hostname,
-        port:     backend.port,
-        path:     req.url,
-        method:   req.method,
-        headers:  Object.assign({}, req.headers, {
-            host:             backend.hostname,
-            'content-length': Buffer.byteLength(body),
-        }),
-        timeout: 8000,
-    };
-
-    const proxyReq = http.request(options, function (proxyRes) {
-        if (proxyRes.statusCode >= 400 && index + 1 < BACKENDS.length) {
-            console.log('Backend ' + backend.hostname + ' returned ' + proxyRes.statusCode + ', trying next…');
-            proxyRes.resume();
-            tryProxy(req, res, body, index + 1);
-            return;
-        }
-        res.writeHead(proxyRes.statusCode, proxyRes.headers);
-        proxyRes.pipe(res, { end: true });
-    });
-
-    proxyReq.on('timeout', function () {
-        proxyReq.destroy();
-    });
-
-    proxyReq.on('error', function () {
-        console.log('Backend ' + backend.hostname + ' failed, trying next…');
-        tryProxy(req, res, body, index + 1);
-    });
-
-    proxyReq.write(body);
-    proxyReq.end();
-}
+const BACKEND_HOST = 'seekingalpha-alb-822910622.ap-southeast-1.elb.amazonaws.com';
+const BACKEND_PORT = 80;
 
 function proxyRequest(req, res) {
     let body = Buffer.alloc(0);
     req.on('data', function (chunk) { body = Buffer.concat([body, chunk]); });
-    req.on('end', function () { tryProxy(req, res, body, 0); });
+    req.on('end', function () {
+        const options = {
+            hostname: BACKEND_HOST,
+            port:     BACKEND_PORT,
+            path:     req.url,
+            method:   req.method,
+            headers:  Object.assign({}, req.headers, {
+                host:             BACKEND_HOST,
+                'content-length': Buffer.byteLength(body),
+            }),
+        };
+
+        const proxyReq = http.request(options, function (proxyRes) {
+            res.writeHead(proxyRes.statusCode, proxyRes.headers);
+            proxyRes.pipe(res, { end: true });
+        });
+
+        proxyReq.on('error', function () {
+            res.writeHead(502, { 'Content-Type': 'text/plain' });
+            res.end('502 — Backend unreachable');
+        });
+
+        proxyReq.write(body);
+        proxyReq.end();
+    });
 }
 
 const server = http.createServer(function (req, res) {

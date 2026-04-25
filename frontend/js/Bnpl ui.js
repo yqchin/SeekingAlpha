@@ -135,7 +135,7 @@
 
     /* ── Credit API ───────────────────────────────────────────────────── */
 
-    var API_URL = '/api/predict-credit/';
+    var API_URL = 'http://seekingalpha-alb-822910622.ap-southeast-1.elb.amazonaws.com/api/predict-credit/';
 
     function formatRM(amount) {
         return 'RM ' + Number(amount).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
