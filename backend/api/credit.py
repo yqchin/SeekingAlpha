@@ -53,7 +53,7 @@ def _explain_reject(X: pd.DataFrame) -> list[dict]:
             'value': None if pd.isna(rv) else round(float(rv), 4),
         }
         for col, sv, rv in zip(X.columns, bad_shap, X.iloc[0])
-        if sv > 0 and col not in {'leadType_risk', 'apr', 'ind_totalnumberoffraudindicators'}
+        if sv > 0 and col not in {'nPaidOff', 'leadType_risk', 'apr', 'ind_totalnumberoffraudindicators'}
     ]
     return sorted(drivers, key=lambda d: -d['contribution'])
 
