@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SALaterPay</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <main class="scene">
+        <section class="phone-shell" aria-label="Seeking Alpha PayLater mobile UI">
+            <header class="hero-header">
+                <div class="status-strip">
+                    <span>MY MAXIS 2:22</span>
+                    <span><i class="fa-solid fa-signal"></i> 4G <i class="fa-solid fa-battery-three-quarters"></i> 63%</span>
+                </div>
+
+                <div class="search-strip">
+                    <button class="country-pill" id="country-btn" type="button">
+                        <i class="fa-solid fa-flag"></i> MY
+                    </button>
+                    <button class="search-pill" id="search-btn" type="button">
+                        <i class="fa-solid fa-magnifying-glass"></i> Search
+                    </button>
+                    <button class="icon-btn clear small" id="profile-btn" type="button" aria-label="Profile">
+                        <i class="fa-solid fa-user"></i>
+                    </button>
+                </div>
+
+                <div class="top-bar">
+                    <button class="icon-btn clear" id="back-btn" type="button" aria-label="Go back">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <span class="brand-logo" aria-hidden="true">
+                        <img src="../assets/seeking-alpha-logo.svg" alt="Seeking Alpha logo">
+                    </span>
+                    <div class="title-wrap">
+                        <p class="title">SALaterPay</p>
+                        <p class="subtitle">Seeking Alpha Wallet</p>
+                    </div>
+                    <div class="right-actions">
+                        <button class="icon-btn clear" id="notify-btn" type="button" aria-label="Notifications">
+                            <i class="fa-regular fa-bell"></i>
+                        </button>
+                        <button class="icon-btn clear" id="settings-btn" type="button" aria-label="Settings">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="limit-block">
+                    <p class="limit-label">Available Limit</p>
+                    <h1 id="available-limit">RM 2,400.00</h1>
+                    <p class="limit-sub">Total Limit 2,400.00 <i class="fa-solid fa-angle-right"></i></p>
+                </div>
+
+                <button class="boost-card" id="boost-btn" type="button">
+                    <div class="boost-left">
+                        <p class="boost-title">SA Limit Boost</p>
+                        <p class="boost-text">For selected merchants. Valid until 30 Apr 2026</p>
+                    </div>
+                    <strong class="boost-amount">+ RM 4,630.00</strong>
+                </button>
+
+                <div class="bill-card">
+                    <div>
+                        <p class="bill-amount" id="due-amount">RM 0.00</p>
+                        <p class="bill-note">Due date falls on 20th of each month</p>
+                    </div>
+                    <i class="fa-solid fa-angle-right"></i>
+                </div>
+            </header>
+
+            <section class="surface">
+                <div class="tab-row">
+                    <button class="tab-btn active" type="button" id="my-bill-btn">
+                        <i class="fa-regular fa-file-lines"></i> My Bill
+                    </button>
+                    <button class="tab-btn" type="button" id="transaction-btn">
+                        <i class="fa-solid fa-clock-rotate-left"></i> History
+                    </button>
+                </div>
+
+                <section class="risk-rate-card" id="risk-card" data-risk-score="82">
+                    <div class="risk-orb" id="risk-orb" aria-label="Risk score">
+                        <span id="risk-score-number">82</span>
+                    </div>
+                    <div class="risk-copy">
+                        <p class="risk-title">Risk Score</p>
+                        <p class="risk-band" id="risk-band">Low Risk</p>
+                        <p class="interest-line">Interest rate: <strong id="interest-rate">1.8% / year</strong></p>
+                    </div>
+                </section>
+
+                <div class="quick-grid">
+                    <button class="quick-item" type="button" id="offers-btn">
+                        <span class="quick-icon"><i class="fa-solid fa-crown"></i></span>
+                        <span>Best Offers</span>
+                    </button>
+                    <button class="quick-item" type="button" id="vouchers-btn">
+                        <span class="quick-icon"><i class="fa-solid fa-ticket"></i></span>
+                        <span>Vouchers</span>
+                    </button>
+                    <button class="quick-item" type="button" id="coins-btn">
+                        <span class="quick-icon"><i class="fa-solid fa-coins"></i></span>
+                        <span>SA Coins</span>
+                    </button>
+                    <button class="quick-item" type="button" id="finance-btn">
+                        <span class="quick-icon"><i class="fa-solid fa-chart-line"></i></span>
+                        <span>Financial Tips</span>
+                    </button>
+                </div>
+
+                <article class="feature-card">
+                    <div class="feature-icon orange">
+                        <i class="fa-solid fa-sack-dollar"></i>
+                    </div>
+                    <div class="feature-copy">
+                        <h3>SA Loans</h3>
+                        <p>Instant cash out. Flexible usage with SA merchants.</p>
+                    </div>
+                    <button class="ghost-btn" id="activate-btn" type="button">Activate For Free</button>
+                </article>
+
+                <article class="feature-card split">
+                    <div class="feature-icon pie">
+                        <i class="fa-solid fa-chart-pie"></i>
+                    </div>
+                    <div class="feature-copy">
+                        <h3>SA Installments</h3>
+                        <p>Need more time to pay your upcoming bill? Try installment today.</p>
+                    </div>
+                    <button class="primary-btn" id="split-btn" type="button">Check Now</button>
+                </article>
+
+                <div class="banner">
+                    <div class="banner-copy">
+                        <p class="banner-kicker">SEEKING ALPHA DEALS</p>
+                        <h3>10% OFF + Extra RM20 OFF</h3>
+                    </div>
+                </div>
+            </section>
+
+            <footer class="action-bar">
+                <div>
+                    <p class="action-label">Next payment</p>
+                    <p class="action-value" id="action-next-payment">RM 0.00</p>
+                </div>
+                <button class="pay-btn" id="pay-btn" type="button">
+                    <i class="fa-solid fa-wallet"></i>
+                    Pay with SA
+                </button>
+            </footer>
+
+            <div class="toast" id="notify-toast" role="status" aria-live="polite"></div>
+
+            <section class="bills-view" id="bills-view" aria-hidden="true">
+                <header class="bills-header">
+                    <button class="bills-icon-btn" id="bills-back-btn" type="button" aria-label="Back to dashboard">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h2>My Bills</h2>
+                    <button class="bills-icon-btn muted" type="button" id="bills-clock-btn" aria-label="Bill history time">
+                        <i class="fa-regular fa-clock"></i>
+                    </button>
+                </header>
+
+                <div class="bills-tabs">
+                    <button class="bills-tab active" id="bills-upcoming-btn" type="button">Upcoming Bill</button>
+                    <button class="bills-tab" id="bills-billed-btn" type="button">Billed</button>
+                </div>
+
+                <div class="bills-scroll">
+                    <div class="bills-content" id="bills-upcoming-list">
+                        <p class="bills-year">Upcoming Bill</p>
+                        <button class="bill-item" type="button" id="upcoming-apr-btn">
+                            <div>
+                                <p class="bill-month">Apr</p>
+                                <p class="bill-tag">Billed</p>
+                                <p class="bill-date">Due Date 20 May 2026</p>
+                            </div>
+                            <div class="bill-amount-wrap">
+                                <strong>RM5.52</strong>
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </button>
+                    </div>
+
+                    <div class="bills-content is-hidden" id="bills-billed-list">
+                        <p class="bills-year">2026</p>
+                        <button class="bill-item" type="button" id="billed-mar-btn">
+                            <div>
+                                <p class="bill-month">Mar</p>
+                                <p class="bill-date">Due Date 20 Apr 2026</p>
+                            </div>
+                            <div class="bill-amount-wrap">
+                                <strong>RM21.90</strong>
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </button>
+                        <button class="bill-item" type="button" id="billed-feb-btn">
+                            <div>
+                                <p class="bill-month">Feb</p>
+                                <p class="bill-date">Due Date 20 Mar 2026</p>
+                            </div>
+                            <div class="bill-amount-wrap">
+                                <strong>RM21.90</strong>
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </button>
+                        <button class="bill-item" type="button" id="billed-jan-btn">
+                            <div>
+                                <p class="bill-month">Jan</p>
+                                <p class="bill-date">Due Date 20 Feb 2026</p>
+                            </div>
+                            <div class="bill-amount-wrap">
+                                <strong>RM37.34</strong>
+                                <i class="fa-solid fa-angle-right"></i>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <section class="payment-confirm-view" id="payment-confirm-view" aria-hidden="true">
+                <header class="payment-confirm-header">
+                    <button class="bills-icon-btn" id="payment-back-btn" type="button" aria-label="Back to dashboard">
+                        <i class="fa-solid fa-arrow-left"></i>
+                    </button>
+                    <h2>Payment Confirmation</h2>
+                    <span class="payment-confirm-head-spacer" aria-hidden="true"></span>
+                </header>
+
+                <div class="payment-confirm-body">
+                    <div class="payment-confirm-card">
+                        <span class="payment-confirm-icon" aria-hidden="true">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </span>
+                        <p class="payment-confirm-kicker">Payment Successful</p>
+                        <h3 class="payment-confirm-amount" id="confirm-paid-amount">RM 0.00</h3>
+                        <p class="payment-confirm-copy">Your payment has been processed using SA Wallet.</p>
+
+                        <div class="payment-confirm-meta">
+                            <p><span>Paid on</span><strong id="confirm-paid-date">--</strong></p>
+                            <p><span>Transaction ID</span><strong id="confirm-transaction-id">--</strong></p>
+                        </div>
+
+                        <div class="payment-confirm-actions">
+                            <button class="confirm-btn secondary" id="payment-view-bills-btn" type="button">View My Bills</button>
+                            <button class="confirm-btn primary" id="payment-done-btn" type="button">Done</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="login-view show" id="login-view" aria-hidden="false">
+                <div class="login-card">
+                    <span class="login-brand" aria-hidden="true">
+                        <img src="../assets/seeking-alpha-logo.svg" alt="">
+                    </span>
+                    <p class="login-kicker">Welcome to SALaterPay</p>
+                    <h2>Sign in to continue</h2>
+
+                    <form class="login-form" id="login-form">
+                        <label for="login-username">Username</label>
+                        <input id="login-username" type="text" placeholder="Enter username" autocomplete="username">
+
+                        <button class="login-submit-btn" id="login-submit-btn" type="submit">Sign In</button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="logout-view" id="logout-view" aria-hidden="true">
+                <div class="logout-card">
+                    <span class="logout-icon" aria-hidden="true">
+                        <i class="fa-solid fa-right-from-bracket"></i>
+                    </span>
+                    <h2>Log Out</h2>
+                    <p id="logout-copy">Are you sure you want to log out?</p>
+                    <p class="logout-user" id="logout-username">Username: -</p>
+                    <div class="logout-actions">
+                        <button class="logout-btn secondary" id="logout-cancel-btn" type="button">Cancel</button>
+                        <button class="logout-btn primary" id="logout-confirm-btn" type="button">Log Out</button>
+                    </div>
+                </div>
+            </section>
+        </section>
+
+    </main>
+    <script src="../js/Bnpl ui.js"></script>
+    <script>
+        (function() {
+            var amt = (Math.random() * 450 + 50).toFixed(2);
+            var display = 'RM ' + amt;
+            document.getElementById('action-next-payment').textContent = display;
+            document.getElementById('due-amount').textContent = display;
+            var confirmAmount = document.getElementById('confirm-paid-amount');
+            if (confirmAmount) confirmAmount.textContent = display;
+        })();
+    </script>
+</body>
+</html>

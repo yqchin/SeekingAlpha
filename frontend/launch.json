@@ -1,0 +1,28 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run UI (Start Server + Open Browser)",
+            "type": "node",
+            "request": "launch",
+            "runtimeExecutable": "C:\\Program Files\\nodejs\\node.exe",
+            "program": "${workspaceFolder}/server.js",
+            "cwd": "${workspaceFolder}",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "serverReadyAction": {
+                "pattern": "Server running at http://localhost:(\\d+)/",
+                "uriFormat": "http://localhost:%s/html/index.html",
+                "action": "debugWithChrome"
+            }
+        },
+        {
+            "name": "Attach Browser Only (Server Already Running)",
+            "type": "pwa-chrome",
+            "request": "launch",
+            "url": "http://localhost:3000/html/index.html",
+            "webRoot": "${workspaceFolder}"
+        }
+    ]
+}
