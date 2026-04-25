@@ -71,10 +71,7 @@
                         <span>Cautious</span>
                         <span>Healthy</span>
                     </div>
-                    <div class="risk-meta">
-                        <p>Default: <strong id="bad-proba">--</strong></p>
-                        <p>Repay: <strong id="good-proba">--</strong></p>
-                    </div>
+
                 </section>
 
                 <section class="credit-improve-card" id="credit-improve-card">
@@ -112,28 +109,25 @@
                             <span class="mini-meter-fill" id="sim-meter-fill"></span>
                         </div>
                         <p class="projected-band" id="sim-projected-band">Projected band: Healthy</p>
+                        
+                        <div class="loan-increase-box">
+                            <span style="font-size: 0.85rem; color: #64748b;">Potential Loan Limit Increase</span>
+                            <strong id="sim-loan-increase" style="display: block; font-size: 1.25rem; color: #10b981; margin-top: 4px;">+RM 0.00</strong>
+                        </div>
 
                         <div class="sim-controls">
+                            <p class="slider-indicator" style="font-size: 0.75rem; color: #64748b; margin-bottom: 8px; text-align: center;"><i class="fa-solid fa-arrow-right-long"></i> Slide right to simulate improvement</p>
                             <label class="sim-control" for="sim-debt">
-                                <span>Settle debt</span>
+                                <span>Supporting documents</span>
                                 <input id="sim-debt" type="range" min="0" max="100" value="0">
                             </label>
-                            <label class="sim-control" for="sim-ccris">
-                                <span>Improve CCRIS</span>
-                                <input id="sim-ccris" type="range" min="0" max="100" value="0">
-                            </label>
                             <label class="sim-control" for="sim-loan">
-                                <span>Reduce loan amount</span>
+                                <span>Reduce loan repayment delay</span>
                                 <input id="sim-loan" type="range" min="0" max="100" value="0">
                             </label>
                             <label class="sim-control" for="sim-frequency">
-                                <span>Repayment frequency</span>
-                                <select id="sim-frequency">
-                                    <option value="0">No change</option>
-                                    <option value="0.35">Monthly</option>
-                                    <option value="0.7">Fortnightly</option>
-                                    <option value="1">Weekly</option>
-                                </select>
+                                <span>Increase repayment frequency</span>
+                                <input id="sim-frequency" type="range" min="0" max="100" value="0">
                             </label>
                         </div>
                     </div>

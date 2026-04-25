@@ -185,13 +185,13 @@
             direction: 'Increase'
         },
         repayment_ratio: {
-            issue: 'Existing debt is taking up too much repayment capacity',
-            action: 'Settle outstanding debt before applying again.',
-            direction: 'Decrease'
+            issue: 'Incomplete supporting documentation',
+            action: 'Provide more comprehensive supporting documents.',
+            direction: 'Increase'
         },
         loanAmount: {
-            issue: 'Requested amount is high for the current profile',
-            action: 'Try a smaller loan amount first.',
+            issue: 'Recent loan repayment delays detected',
+            action: 'Reduce loan repayment delay for better standing.',
             direction: 'Decrease'
         },
         payFrequency: {
@@ -307,10 +307,9 @@
     function updateSimulator() {
         var score = clamp(dashboardData.credit_score || 0, 0, 100);
         var uplift =
-            simulatorValue('sim-debt') * 22 * driverWeight('repayment_ratio') +
-            simulatorValue('sim-ccris') * 24 * driverWeight('clearfraudscore') +
-            simulatorValue('sim-loan') * 18 * driverWeight('loanAmount') +
-            Number(($('sim-frequency') || {}).value || 0) * 14 * driverWeight('payFrequency');
+            simulatorValue('sim-debt') * 200 * driverWeight('repayment_ratio') +
+            simulatorValue('sim-loan') * 150 * driverWeight('loanAmount') +
+            simulatorValue('sim-frequency') * 150 * driverWeight('payFrequency');
         uplift = clamp(uplift, 0, 100 - score);
 
         var projected = Math.round(score + uplift);
@@ -320,12 +319,14 @@
         var deltaEl = $('sim-score-delta');
         var bandEl = $('sim-projected-band');
         var fillEl = $('sim-meter-fill');
+        var loanIncreaseEl = $('sim-loan-increase');
 
         if (currentEl) currentEl.textContent = Math.round(score);
         if (projectedEl) projectedEl.textContent = projected;
         if (deltaEl) deltaEl.textContent = '+' + delta;
         if (bandEl) bandEl.textContent = 'Projected band: ' + scoreToBandLabel(projected);
         if (fillEl) fillEl.style.width = projected + '%';
+        if (loanIncreaseEl) loanIncreaseEl.textContent = '+RM ' + (delta * 150).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
     function populateDashboard(data) {
@@ -335,8 +336,6 @@
         var riskBandEl     = $('risk-band');
         var riskCardEl     = $('risk-card');
         var riskPointerEl  = $('risk-pointer');
-        var badProbaEl     = $('bad-proba');
-        var goodProbaEl    = $('good-proba');
 
         dashboardData = data || dashboardData;
 
@@ -350,8 +349,6 @@
         if (riskNumEl)  riskNumEl.textContent = Math.round(score);
         if (riskBandEl) riskBandEl.textContent = bandToLabel(data.band, data.decision);
         if (riskPointerEl) riskPointerEl.style.left = score + '%';
-        if (badProbaEl) badProbaEl.textContent = formatPercent(data.bad_proba);
-        if (goodProbaEl) goodProbaEl.textContent = formatPercent(data.good_proba);
         if (riskCardEl) riskCardEl.dataset.riskScore = score;
         renderDrivers(data);
         updateSimulator();
@@ -532,7 +529,7 @@
         });
     }
 
-    ['sim-debt', 'sim-ccris', 'sim-loan', 'sim-frequency'].forEach(function (id) {
+    ['sim-debt', 'sim-loan', 'sim-frequency'].forEach(function (id) {
         var el = $(id);
         if (!el) return;
         el.addEventListener('input', updateSimulator);
