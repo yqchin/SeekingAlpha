@@ -1,0 +1,10 @@
+*.log
+*.pyc
+__pycache__/
+db.sqlite3
+.env
+varmisc/
+.venv
+venv/
+env/
+.docker-compose.yml.swp
