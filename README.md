@@ -114,10 +114,4 @@ cd your-repo
 pip install -r requirements.txt
 
 # Run app
-streamlit run app.py# 🧠 AI BNPL Credit Risk Engine
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run app
-streamlit run app.py
+streamlit run app.py# 
